@@ -1,4 +1,6 @@
 # Lytro Unlock - Making a bad camera slightly better
+![alt text](https://github.com/ea/lytro_unlock/blob/main/lytro_images/00_main.jpg?raw=true)
+
 ![_DSC6236](https://user-images.githubusercontent.com/65802/213890019-91dc7961-75c2-4b6c-b12e-40b2f86a5454.jpg)
 
 ## TL;DR; summary 
