@@ -1,5 +1,6 @@
 # Lytro Unlock - Making a bad camera slightly better
-![_DSC6236](https://user-images.githubusercontent.com/65802/213890019-91dc7961-75c2-4b6c-b12e-40b2f86a5454.jpg)
+![alt text](https://github.com/ea/lytro_unlock/blob/main/lytro_images/00_main.jpg?raw=true)
+
 
 ## TL;DR; summary 
 I’ve recently spent some time playing with and reverse engineering this curious piece of tech that was a first consumer oriented,though odd looking, lightfield camera called Lytro. Killer feature of this new technology was the ability to refocus the image after it was taken! 
