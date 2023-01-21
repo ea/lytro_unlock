@@ -11,7 +11,7 @@ This project documents and implements a python library that unlocks and makes av
 - Custom code execution
 
 Although it failed as a commercial product, lytro camera has some pretty nifty tech (only one of which is very high optical zoom). It is my hope that somebody out there has a cool idea that would benefit from having full software control over the camera. 
-If you are interested in the details, read on. Otherwise, feel free to play with included samples that are included. 
+If you are interested in the details, read on. Otherwise, feel free to play with supporting software under [https://github.com/ea/lytroctrl].
 
 ## The Why - Start
 
