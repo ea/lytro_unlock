@@ -17,14 +17,13 @@ If you are interested in the details, read on. Otherwise, feel free to play with
 
 ## The Why - Start
 
-Anybody remember these weird rectangles from the photo above? They were all over tech news websites almost a decade ago. They were supposed to usher in the new age of photography. 
-Some of you might have them tucked away in some drawer as a reminder of wasted money.
-The product promised so much, yet what it delivered in reality was oh so disappointing. 
-Why did I get interested in this? Few months ago , an interesting twitter thread caught my eye. It was written by (https://web.archive.org/web/20221014234930/http://twitter.com/warren_craddock) Warren Craddock and was talking about tech projects can have so much momentum that people can ignore the obvious flaws and showstoppers for a long time before they are abandoned. One of the projects he talked about was a Lytro camera. Flaws being that , due to laws of physics and optics, most of the benefits of the technology (refocus, paralax) would be of no practical use to general public. 
-Long story short, after developing a second generation of the LightField camera called Illum (this time in a more familiar DSLR-like package) company soon went bust. 
+Anybody remember these weird rectangles from the photo above? They were all over tech news websites almost a decade ago. They were supposed to usher in the new age of photography. Some of you might have them tucked away in some drawer as a reminder of wasted money. The product promised so much, yet what it delivered in reality was oh so disappointing. 
+
+Why did I get interested in this? Few months ago, an interesting twitter thread caught my eye. It was written by Warren Craddock and was talking about tech projects can have so much momentum that people can ignore the obvious flaws and showstoppers for a long time before they are abandoned (note: tweets have been deleted, but you can dig them up in the archive - they have some interesting insights). One of the projects he talked about was a Lytro camera. Flaws being that , due to laws of physics and optics, most of the benefits of the technology (refocus, paralax) would be of no practical use to general public. Long story short, after developing a second generation of the LightField camera called Illum (this time in a more familiar DSLR-like package) company soon went bust. 
+
 Naturally, the first question that popped into my mind was: “I wonder how cheap those are on eBay right now?”
 Sure enough, if you are patient, you can easily pick them up for anywhere from $20 to $40 dollars. A great discount from the original retail price. 
-I decided to procure one, if for no other reason than simply to have it as an interesting relic. But… The curiosity got the better of me and I soon found myself digging into the firmware. 
+I decided to procure one, if for no other reason then simply to have it as an interesting relic. But the curiosity got the better of me and I soon found myself digging into the firmware. 
 
 ## Goals
 
@@ -34,11 +33,12 @@ The camera itself has very little in terms of controls, yet you are supposed to 
 Newer firmware versions support WiFi access point mode, but the official software doesn’t make much use of it. Maybe the app did once, but it doesn’t matter. No official API or documentation was ever provided.
 
 There were a couple of community and 3rd party projects that aimed to replicate the official software and did a very good job on documenting how things work. Highlights of those are :
-- lytro meldown (insert web page) by <INSERT NAME> which was of immense help as it documents publicly known parts of the communication protocol, has an archive of previous firmware versions and still runs a firmware update service. 
-- Lyli (inser webpage) - linux based implementation of USB communication protocol  
+- [lytro meldown](http://optics.miloush.net/lytro/TheCamera.aspx) by Jan Kučera which was of immense help as it documents publicly known parts of the communication protocol, has an archive of previous firmware versions and still runs a firmware update service. 
+- [Lyli](https://github.com/martin-pr/lyli/) - linux based implementation of USB communication protocol  
 
 While both of these provide good starting points, they don’t offer much benefit over the official software, only a few extra features. 
-Just looking at a product , without considering existing software, I thought it would be a lot more useful if it had features that a normal webcam would have. With that in mind, I set out to see if implementing the following was possible:
+
+Just looking at a product, without considering existing software, I thought it would be a lot more useful if it had features that a normal webcam would have. With that in mind, I set out to see if implementing the following was possible:
 - control zoom level through software 
 - Control focus point through software
 - Take a picture on demand 
@@ -47,7 +47,7 @@ Initially, as stretch goals I was considering:
 - Arbitrary code execution
 - Live View / video streaming
 
-Ok, with that, lets have a specific use case we want to make possible: Aim the camera through the window, zoom to certain level and feed the live view images to computer-vision code. Whenever a squirrel  is detected in view , take a photo. Then refocus on demand later. 
+Ok, with that, lets have a specific use case we want to make possible: Aim the camera through the window, zoom to certain level and feed the live view images to computer-vision code. Whenever a squirrel  is detected in view , take a photo. Then refocus on demand later. Wouldn't that be fun?
 
 
 ## Take it apart
