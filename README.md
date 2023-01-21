@@ -55,12 +55,30 @@ Ok, with that, lets have a specific use case we want to make possible: Aim the c
 First things first, lets take a look at how this thing is made.
 
 Due to its unusual shape , the device  has an unusual number of boards that are interconnected. This makes it a bit of a pain to disassemble, solder wires to test points and then reassemble but just by looking at the following photos we can identify interesting things. 
+
+![alt text](https://github.com/ea/lytro_unlock/blob/main/lytro_images/01_ccd_board_front.jpg?raw=true)![alt text](https://github.com/ea/lytro_unlock/blob/main/lytro_images/02_ccd_board_back.jpg?raw=true)
+
+
 Topmost board contains the sensor with the microlens array and connects further to lens controls. Lens has tiny motors and actuators that control zoom, focus, shutter and built in neutral density filter.
 
-Next is a power/battery control board which is also where usb connection is located. Beneath the battery is the main SoC board which is based around a MIPS MCU called Coach (Camera On A Chip) from Zoran corporation. This SoC seems to be very common with dashcam manufacturers from the same era. On the flipside, we can see Samsung’s flash and other ICs. Certain labeled test points would suggest a JTAG interface to be present. 
+![alt text](https://github.com/ea/lytro_unlock/blob/main/lytro_images/03_battery_board_front.jpg?raw=true)![alt text](https://github.com/ea/lytro_unlock/blob/main/lytro_images/04_battery_board_back.jpg?raw=true)
+
+Next is a power/battery control board which is also where usb connection is located. 
+
+
+![alt text](https://github.com/ea/lytro_unlock/blob/main/lytro_images/05_main_soc_board_front.jpg?raw=true)![alt text](https://github.com/ea/lytro_unlock/blob/main/lytro_images/06_main_soc_board_back.jpg?raw=true)
+
+Beneath the battery is the main SoC board which is based around a MIPS MCU called Coach (Camera On A Chip) from Zoran corporation. This SoC seems to be very common with dashcam manufacturers from the same era. On the flipside, we can see Samsung’s flash and other ICs. Certain labeled test points would suggest a JTAG interface to be present. 
+
+![alt text](https://github.com/ea/lytro_unlock/blob/main/lytro_images/07_wifi_board_front.jpg?raw=true)![alt text](https://github.com/ea/lytro_unlock/blob/main/lytro_images/08_wifi_board_back.jpg?raw=true)
 
 Finally, the last board connects to the display as well as the capacitive touch sensor that controls zoom. It is on this board that we find a peculiar looking  unpopulated connector pad. Basic testing quickly reveals UART pins like shown, but all we get is a short boot message and no input or echo…
+
+
+
 Lets make a nice breakout of those pins for later use just in case. 
+
+![alt text](https://github.com/ea/lytro_unlock/blob/main/lytro_images/09_uart_harness.jpg?raw=true)
 
 ## The firmware
 
