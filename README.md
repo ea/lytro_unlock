@@ -898,7 +898,9 @@ Keep alive function above will periodically issue a query command just to stave 
 And with that, we have all the components for what we set out to do. We can control zoom and focus, we can telecommand the camera to take a photo and we can stream live view which can be fed into computer vision algorithms. 
 There's plenty of squirells in my backyard, but I can take much better photos of them with my regular camera, and most of them are in focus!
 	
-That being said, I had fun doing thing and would love to hear if somebody has an interesting ideas that could benefit from this project. Lightfield cameras are definitely an interesting technology and this might be an affordable way to experiment with them. 
+That being said, I had fun doing this and would love to hear if somebody has any interesting ideas that could benefit from this project. Lightfield cameras are definitely an interesting technology and this might be an affordable way to experiment with them. 
+	
+Feel free to open issues to ask questions and make pull requests!
 	
 Cheers,
 
