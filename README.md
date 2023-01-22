@@ -296,31 +296,612 @@ Well, looks like that takes care of the locked serial console. In addition to un
 
 ## Commands over Wifi
 
-Following is the full list of command classes and commands. Not all of them have been fully implemented in the accompanying software yet. If you find it useful, feel free to make a pull request. 
+Full list of commands is quoted above. Not all of them have been fully implemented in the accompanying software yet. If you find it useful, feel free to make a pull request. 
 
-- Full list 
+To test it out, enable WiFi on the lytro camera and connect to it. Then run one or more samples from [lytroctrl](https://github.com/ea/lytroctrl) examples.
 
 Some of the commands are more complex than others and some even have subcommands of their own. 
-    - Wifi Settings
-        - Looks like two modes are supported, the AP mode that is the default, and “sync” mode where the camera connects to the specified access point. The second mode would probably be a lot more convenient to use, but I haven’t yet found a way to persist these particular settings across reboots. 
-    - Live View
-        - Parameters are enable/disable, compression ratio and FPS specification. When Live View is enabled, a new thread is started on the camera that simply sends JPEG frames over multicast UDP <insert address and port>. These can easily be captured by ffmpeg for example: <insert ffmpeg cmdline> It’s a bit unstable, and care should be taken when choosing the parameters. Check out the acompanying LiveView.py script
-    - Manual Controls
-        - Live View above is actually implemented as a subcommand to manual control command. Subcommands are as follows : <insert list of subcommands>
-    - Command Exec and Serial Sync
-        - As shown previously, the firmware has a sort of command shell which can be accessed thought serial console.  It turns out that we can send commands to it directly through CmdExec command. Similarly, we can read the serial output buffer via SerialSync command. This enables implementing a simple shell over wifi. Check out the `shell.py` script to see how it works. 
-Built-in shell
+ - Wifi Settings
+  
+	Looks like two modes are supported, the AP mode that is the default, and “sync” mode where the camera connects to the specified access point. The second mode would probably be a lot more convenient to use, but I haven’t yet found a way to persist these particular settings across reboots. 
+ - Live View 
+  
+	Parameters are enable/disable, compression ratio and FPS specification. When Live View is enabled, a new thread is started on the camera that simply sends JPEG frames over multicast UDP <insert address and port>. These can easily be captured by ffmpeg for example: `ffmpeg -i 'udp://224.0.0.100:10101?&localaddr=10.100.1.100' -vcodec copy output.mp4`. It’s a bit unstable, and care should be taken when choosing the parameters. Check out the `LiveView.py` script in [lytroctrl](https://github.com/ea/lytroctrl)
+
+ - Manual Controls
+  
+	Live View above is actually implemented as a subcommand to manual control command. Subcommands are as follows : 
+    - enable manual controls
+    - set creative mode
+    - control nd filter
+    - set zoom level
+    - set exposure
+    - set sensor gain
+    - enable live view
+ - Command Exec and Serial Sync
+	
+  As shown previously, the firmware has a sort of command shell which can be accessed thought serial console.  It turns out that we can send commands to it directly through CmdExec command. Similarly, we can read the serial output buffer via SerialSync command. This enables implementing a simple shell over wifi. Check out the `shell.py` script in [lytroctrl](https://github.com/ea/lytroctrl) to see how it works. 
+
+### Built-in shell
 
 With ability to unlock the camera over wifi, and with combined ExecCmd and SerialSync commands there’s no need to open the camera or do any physical modifications in order to explore the built in shell. The following is the complete list of commands with their associated descriptions:
 
+```
 
-- List of commands with help
-- Highlights 
-    - Rfitamron 
-    - Rfisettings
-    - Rficapture
-Tools and utils
-- Shell
-- Demo
-- LiveView
+!hist -- list <num entries> last commands
+!histcfg -- config history size (32..1024 / 80..256). <stat> for status
+!color -- echo each entered cmd with color. no entry disables echo mode
+!histlog -- log the history and restore if possible after reboot
+!list -- list all available commands or <list index>
+!listhelp -- list all available commands that their help string contains 'keyword'
+!prompt -- change monitor prompt (see extended help). give no args to restore default
+!acclines -- starts / add to / list print / raw print line accumulation mode (none to reset)
+!evalfmt -- configures the expression eval output format modes
+!dumpstack -- dumps the symbols of the current active (line acc.) threads stack dump
+!script -- create (or remove) a script. source can be line acc. or 1 line or history range
+!memcli -- gets the monitor (cli) current memory usage
+!vercli -- displays the monitor (cli) current release info (version + date)
+!quit -- quits the monitor command
++ -- repeat last <entries count> <count> times
+: -- edit history <entry index> if exists (1-based). 0 is synonym for last entry
+= -- evaluates the expression. use 'ans' to sign the previous result
+help -- Prints function help
+ls -- Prints all avaliable functions help
+prompt -- Set new prompt
+repeat -- Repeate a cmd command num times with a delay between (ms)
+# -- Comment - everything is ignored
+// -- Comment - everything is ignored (deprecated in new CLI)
+reprintcrash -- Reprint the crash that triggered debug console
+dumpall -- Reprint the crash dump
+crash -- Force the system to crash (for debug!)
+mfc0 -- Get a coprocessor 0 register
+set_media -- Choose media types
+smed -- Choose media types
+format -- Format a media
+mount -- Mount a media
+mountx -- Mount a media
+mountdram -- Create and Mount Dram media
+flush -- Flush the media
+gms -- Get media status
+goms -- Get Other media status
+delall -- Delete all DCF objects
+delete -- Delete an object
+lock -- Lock an object
+unlock -- Unlock an object
+copy -- Copy an object
+move -- Move an object
+copyto -- Copy an object to another drive
+dcfdump -- DCF dump
+dcfdumpraw -- DCF dump - raw
+dcfdumpobj -- DCF dump - objects
+dcfdumpobjindex -- Dump DCF object
+cfread --
+ideread --
+ataread --
+sdread --
+msread --
+ssfdcread --
+nandread --
+nandreadp --
+nandnsread --
+nandnsreadp --
+noraread --
+noriread --
+cd -- Change directory
+cdc -- Change dir to first DCF folder
+dir -- List directory's contents
+ren -- Renames a file/directory
+mkdir -- Create a directory
+del -- Delete a file/directory
+cfflush -- Flushes contents into file
+msflush -- Flushes contents into file
+msflushp -- Flushes physical contents into file
+nandflush -- Flushes contents into file
+nandnsrflush -- Flushes contents into file
+burstmode -- Switches read operations mode
+msextra -- Flushes extra bytes into file
+nandextra -- Flushes extra bytes into file
+ssfdcextra -- Flushes extra bytes into file
+cferase -- Erase CF sectors
+nanderase -- Erase the whole Nand media
+ssfdcerase -- Erase the whole SSFDC media
+norerase -- Erase the whole Nor media
+ssfdcreadp -- Read physical sectors
+ssfdcwritep -- Write physical sectors
+nandwritep -- Write physical sectors
+ssfdcreset -- Reset SSFDC
+msreadp -- Read physical sectors
+norreadp -- Read physical sectors
+sdwrite -- Write sectors
+cfwrite -- Write sectors
+atawrite -- Write sectors
+atadma -- Enable/Disable uDma mode
+nandimg -- Burn image file as-is to nand
+fcuram -- Print the content of the DMA ram
+sdblen -- Set SD Block Length for R/W commands
+msleep -- Switch media to Sleep mode
+getmattr -- Returns attribute of current media (I43_GetMediaAttr)
+mretry -- Retry Mechanism configuration
+mreset -- Reset media
+mserial -- Switch media to Serial/Parallel mode
+merase -- Erase Num Sectors from media
+msetibd -- Set IBD by dummy data
+mgetibd -- Get IBD
+setfat -- Set FAT format type
+mspeedtest -- Check average media speed (NAND/MS/SD)
+mdirect -- DirectMediaAccess
+mparam -- DirectGetMediaParam
+flashdump -- Dump resident flash content
+cr -- Set compression ratio
+ei -- Edit Image
+getexp -- Get exposure/gain
+setexp -- Set current exposure
+wbs -- Set WB scalers
+wbg -- Get WB scalers
+wbm -- Set AWB mode
+aem -- Set AE mode
+afwinget -- Get window AF values
+afwinset -- Set window AF dimensions
+wbcalib --
+stat -- Set statistics pattern
+statdebug -- Print statistics on/off
+algtime -- Print algorithms time statistics
+aecfg -- Set AE configuration
+wdi_timer_on_cop -- test wdi timer on cop
+dump_log_wdi_timer -- dump logs from test wdi timer on cop
+read -- run lsc calibration
+lsccal -- run lsc calibration
+lsccshc -- run lsc & csh calibration with captured frame
+lsccsh -- run lsc & csh calibration with source file
+ca -- MonitorSetIpuCa
+lsc -- MonitorLsc12
+csh -- Read back the CSH config resource data
+mixf -- Test iMix for smear purposes
+mixd -- Test iMix for dblemishes purposes
+smearsim -- Run smear simulator (read raw input from sd card)
+smear -- Control current instance of smear
+mixd -- Test iMix for dblemishes purposes
+dblemish -- control dark blemishes reduction filter api
+dblemish_test --
+dblemish_testi --
+forcedc -- Force DC creation in preview mode
+vscale -- Test IPU Bayer VScaler
+anr -- Configure ANR for a given mode
+previewFps -- Print display frame rate
+dist -- enable disable dist
+rg -- Read 16bit GPP RAM address
+fc -- Call a function
+sum -- I43_SetUsbMode
+hqd -- Host queue dump
+hlqd -- Host log queue dump
+setp -- Set parameter
+getp -- Get parameter
+mode -- Set functional mode
+reboot -- Reboot using given boot configuration
+modeconf -- Select mode configuration
+cc -- I43_ConfigCapture
+cm -- I43_ConfigMovie
+cp -- I43_ConfigPreview
+playerdump -- Dump player info
+getsr -- Dump status registers Sr1 & Sr2
+cgut -- Dump CGU table
+mips -- Get available MIPS
+mipscop -- Get available MIPS
+cpu -- Print CPU load statistics
+ver -- Get version number
+prof -- Profiling tool
+cmdcr -- Command file create
+cmdex -- Command file execute
+delay -- Delay in ms (in a command file)
+sci -- I43_SetCurrentImage
+gci -- I43_GetCurrentImage
+gcii -- I43_GetCurrentDirImage
+wav -- Play Wav file
+mp3 -- Play MP3 file
+ccc -- I43_CaptureClipCommand
+pcc -- I43_PlaybackClipCommand
+mpeg4 -- Switch to MPEG4 video
+mp4 -- Switch to MPEG4 video with AAC audio
+h264 -- Switch to H264 video
+tape -- TapeRecorder
+le -- Print the last error number
+photoframe -- Add photo-frame to captured images
+ptpdumpdb --
+rrs -- Read Register Shadow
+wrs -- Write Register Shadow
+c2ccalib -- C2C calibration
+imagesize -- Set image size
+timing --
+rfstest -- Test read File
+wfstest -- Test write File
+g -- Start PWR consumption prints
+cgucfgen -- Configure and Enable Clock
+cguop -- get/ set cgu clocks
+cguoptest -- Test cguop
+cgudis -- Disable Clock
+rosc -- Get CGU ring oscillator counters
+tlb --
+rsgop -- Set gop size of recorded clips
+rsmaxb -- Set max b frames of recorded clips
+mtmstart -- Initialize timing mark of movie group
+mtmstop -- Dumps timing mark of movie group
+pwrtime -- Time power state for <ms>,dump results to <fileName>
+addmulticonfig -- Add configuration for Usb multi mode
+fdprepare -- Prepare preview for face detection
+fd -- Enable/Disable/TestMode face detection
+fdps -- set fd profile
+fdpg -- get fd profile
+fdtmstart -- Initialize timing mark of FDTA group
+fdtmstop -- Dumps timing mark of FDTA group
+fdd -- Dumps timing mark of FDTA group
+md5sum -- Calculate and print the md5 sum <size> bytes at <addr>
+md5file -- Calculate and print the md5 sum of the contents of <filename>
+shmoo -- ddr calibration
+shmoom -- ddr calibration
+ddr3 -- ddr3
+testpip -- TestHWPIP
+dimix_a16b -- Test DirectImageMix add 16 bit
+dimix_c16b -- Test DirectImageMixEx copy 16bit
+mix16 -- test 16 bit blending with IMix
+mix8 -- test 8 bit blending with IMix
+imixpd --
+imixlut -- Test IMIX blending with alpha LUT
+gpioset -- Output to GPIO
+gpioget -- Input/Read from GPIO
+fd2log -- fdta2 batch log
+sym -- Find Symbol from Address
+dis -- Disassemble MIPS code
+tfload --
+tfconfig --
+tfenable --
+nr12 -- Activate C12 NR
+nr13 -- Activate C13 NR
+zl12 -- Activate C12 ZLIGHT
+zl13 -- Activate C12 ZLIGHT
+scrd -- save capture RAW/YUY
+sprd -- save preview RAW/YUY
+srrd -- save direct movie Rec/Play RAW/YUY
+perfdump -- Print all messages for groups
+perfverb -- Change the Performance Verbosity Level
+perfinit -- Init Performance logging groups
+perfprint -- Call Print Function on groups
+dsyuv -- Saves AVI frame# to JPEG with given out format
+otprepare -- Prepare preview for object tracking
+ot -- Enable/Disable object tracking
+ddrtest -- Start DDR test
+ippg -- Print the input numbers
+videmu --
+rer -- Configure Capture RER
+stillfd -- Configure still FD
+eefilter -- set ee filter
+testvec -- test Vector font feature
+testgvec -- test graphic Vector font feature
+test8vec -- test OSD8 Vector font feature
+dhry -- run dhrystone
+stabmode -- Stabilizer mode (before entering recording!)
+dvsenable -- Enable/disbale DVS filter
+dvsconfig -- Configure DVS
+dvslogtransforms -- Logs each bounding box and transform as it is received from DVS
+dvslogapis -- Logs each DvsFlowProxy API call
+dvslogmvs -- Logs DVS motion vectors for debugging purposes
+dvslogstats -- Logs DVS statistics for debugging purposes
+dvsgenboundingbox -- Enable/disable creation of DVS bounding boxes
+dvsgentransforms -- Enable/disable creation of DVS transforms
+dvsoverboundingbox -- Override DVS bounding box for debugging purposes
+dvsovertrans -- Override DVS transform for debugging purposes
+dvsenablehighload -- Enable/disable high load for DVS
+dvsarcstop -- Stop the arc
+rfd -- FDTA in rec
+cbcmode -- cbc activation on video
+icacop -- ICA translator on COP
+icatrans -- ICA translator on COP
+saveipfilters -- Dumps filters to binary file
+loadipfilters -- Loads filters from a binary file
+disableipfilters -- Clear filters(mode or all)
+enableipfilters -- Enables filters(mode or all)
+reportipfilters -- Reports all filters
+copyipfilters -- Copy filters from one mode to another
+altcodecopy -- Enable/Disable imix code copy
+setssm -- set sensor submode
+jtag -- Enable JTAG for Main CPU (mips), COP CPU (cop) or ARC CPU (arc) or Main & COP CPUs (mips-cop) or Main, COP & ARC CPUs (
+syscheckaccuracy -- Set SysCheck thread accuracy (0 to disable)
+passistcr -- Creates Panorama Assist
+passistds -- Destroys Panorama Assist
+mawb -- AWB configuration
+ipslsc -- IPS LSC test
+hfr -- Creates HFR specific configuration
+playhisto1 -- MonitorHistogram
+playhisto2 -- MonitorTestSoftwareHistogram
+custom -- Print the input numbers
+typer -- Thresholds for typer
+typerdebug -- Debug prints for typer
+sdioi -- SDIO card init 1BIT/4BIT
+sdiori -- SDIO card read info
+sdiorc -- SDIO card read common CIS
+sdiosb -- SDIO card switch bus width
+sdiowr -- SDIO card write register
+sdiorr -- SDIO card read register
+sdiowm -- SDIO write multi bytes
+sdiorm -- SDIO read multi bytes
+sdiowmb -- SDIO write multi blocks
+sdiormb -- SDIO read multi blocks
+sdioset -- SDIO read set block size
+sdioget -- SDIO read get block size
+sdiow -- SDIO wait interrupt
+rfidummy -- RFI Dummy monitor command
+rfisdw -- Config Square LCD
+rfisquaresen -- Config Square Sensor
+rfiplaytest -- Play Test
+rfigetpa -- GetParamArray
+rfitaptoae -- Tap to Ae
+rficaptureold -- Captura an image
+rfidcfdump -- List all DCF contents
+rfidemodseq -- Capture image sequence for demodulation
+rfierror -- Print the last Rfi error that occurred
+rfiipucfg -- Enable or disable a specific IPU filtering pass
+rfiipuclobber -- Start an infinite loop that clobbers the IPU
+rfijpegquality -- Set the JPEG compression mode (quality)
+rfiprint -- Print a message to the console
+rfitrace -- Dump the thread stack traces to the console
+rfiver -- Print the firmware version information
+rfiprofile -- Profiles the processor using some simple loops
+rfisfc -- Calls FC with a state
+rfilayershow -- Layer Show
+rfitimers -- Enables/disables timer printouts
+rfilogstart -- Starts RFI timing system
+rfilogstop -- Stops RFI timing system
+rfigsiu -- Runs GSIU 2Wire test
+rfi7260 -- Initialize ITE 7260
+rfisendump -- Dump Aptina 14M registers to UART
+rfisenscan -- Uses Aptina test pattern to scan through colors
+rfipwr -- Control PWR17
+rfisenwr -- Send value to Aptina 14MP over I2C
+rfisenrd -- Read value from Aptina 14MP over I2C
+rfiitewr -- Send value to Ite7269 over I2C
+rfiiterd -- Read value from Ite7260 over I2C
+rfitamron -- Tell the tamron lens what to do
+rfiiq -- Tweak image quality parameters
+rficapture -- Capture an image
+rfiosdtest -- Displays OSD test pattern
+rfirawtests -- Encodes a 16bpp RGGB raw image in different ways
+rfilua -- Enters the Lua console, or runs the script if given
+rfilua2 -- Runs the given script in the monitor thread
+rfilua3 -- Runs the given chunk in the lua thread
+rfiluagui -- Enters Lua and runs the menu.lua script
+rfimd5test -- Run MD5 performance test
+rfilcdcmd --
+rfimain -- Advances RFI main to a stage
+rfisentest -- Sensor test
+rfishuttest -- Shutter test
+rfimediatest -- Various media tests
+rfical -- Run the camera per-unit calibration
+rfimode90loop -- Loops
+rfilcded -- Sets ED mode
+rfiviewmenutest -- Tests/demos the view menu
+rfibat -- Measure battery voltage
+rfibatcsv -- Measure battery voltage/current/percent, temperature (C/adc), time
+rfibatrf -- Read gas gauge flash memory
+rfibatwf -- Write byte gas gauge flash memory
+rfibatwritedfi -- Write gas gauge data flash image
+rficharger -- Read/Write charger IC registers
+rfiemergencypower -- Override emergency power parameters
+rfigain -- Set capture gain
+rfiexp -- Set capture exposure
+rfind -- Set ND filter override
+rfibipos -- Enable/Disable biposition
+rficomraw -- Enable/Disable saving compressed raw images
+rfiaccel -- Read accelerometer state
+rfimotortest -- Perform lens motor/positioning test
+rfijpegtest -- Load and then save the most-recent DCF image
+rfiers -- Switches between ERS and mechanical shutter
+rfipwm -- Controls the COACH PWM
+rfiaesweep -- Enables/Disabled AE sweep test
+rfiwdi -- Enables/Disables watchdog
+rfipngtest -- Tests loading an ARGB image from a PNG
+rfifwup -- Upgrades from a file
+rfimsct -- Sets mechanical shutter closing time in us
+rfiidle -- Can be used to disable the idle timeout
+rfiadc -- Reads RAW ADC value
+rfideldcf -- Deletes all DCF images
+rfiopenfiles -- Lists open files
+rfievcomp -- Sets exposure compensation
+rfiusb -- Camera USB Mode control
+rfisenid -- Prints the FuseID of the Aptina sensor
+rfilenslambda -- Run lens calibration routine to measure lambda
+rfilensconv -- Convert lens calibration file
+rfidemosaicinfo -- Print demosaic parameter
+rfidemosaic -- Perform demosaic test
+rfitestuart -- Perform firefly UART client test
+rfisettings -- Print the settings DB matching substr to the console
+rficsi2ctgl -- Perform a toggling of I2C pins for CS/TS
+rficop -- Run monitor command on COP
+rfimcutest -- Run the MCU Spy-Bi-Wire test
+rfimcudump -- Dump MCU memory
+rfimcuflash -- Flash MCU
+rfisettimestamp -- Set TimeStamp to COACH RTC
+rfigettimestamp -- Prints time stamp from COACH RTC
+rfisetaeparam -- Set the AE parameters
+rfiset16to1agg -- Turn on/off the aggregation of 16 raw captures
+rfidarkframe -- Enable dark frame
+rfireboot -- Reboot the camera
+rfireboottolowbat -- Reboot the camera to low battery mode
+rficat -- Meow :-)
+rfitestspill -- Tests enabling/disabling small pool spill over
+rfiipsmax -- Tests finding max value using IPS
+rfiimix -- Tests for IMIX
+rfiipu -- Tests for IPU
+rfidumpae -- Dumps COACH AE parameters
+rfilam -- Enqueue fake AF result for PB refocusing
+rfisetsetting -- Set setting (type can be anything)
+rfigetsetting -- Get setting (type can be anything)
+rfisetsettingex -- Set setting
+rfigetsettingex -- Get setting
+rfiresetsetting -- Reset setting to default
+rfisetstate -- Set state setting
+rfipopup -- Insert an event that will cause a popup warning
+rfiviewiq -- View image quality test code
+rfifsck -- Runs FSCK
+rfimcusetserno -- Set camera serial number
+rfidumpsernos -- Dump serial number files
+rfimcutestalive -- Test that MCU is alive
+rfimcutestpin -- Test MCU pin state
+rfirenesas -- Dump Renesas register shadow
+rficleanup -- Cleanup camera before shipping to end-users
+rficheckcam -- Pre-ship check of camera state/contents
+rfisil -- Sets infinity target lambda
+rfigil -- Gets infinity target lambda
+rfiinspectuihist -- Dump history of UI mode transitions
+rfiinject -- Injects event into camera for QA/test/debugging
+rfidebugcolor -- Debugging function for on-camera IQ
+rfiunbrick -- Remove the camera bricked flag
+rfiprotect -- Drive WP
+rfipcbver -- Get PCB revisions
+wifi -- Main entry point For embWiSe WIFI
+rfiwifimode -- With no arguments, display wifi mode; with an argument, set it
+rl -- Read 32 bit address
+wl -- Write 32 bit address
+mf -- Fill memory with a value
+rv -- Read a variable value or array index
+wv -- Write a variable value or array index
+dump -- Dump memory to screen
+dumpx -- Dump DRAM to screen. Hex Input
+dumpf -- Dump memory to file
+dramsize -- Print dram size
+mi -- Get Max Alloc Size
+mt -- Dump Alloc table
+mxt -- Dump pool structure
+mls -- Dump list of pools
+ldstart -- Start leak detection
+ldstop -- Dump leaks
+hmpp -- Hardware memory protection (physical address)
+hmpoff -- Turn off hardware memory protection. 0: main (default), 1: secondary.
+dmstat -- directmovie memory usage statistics
+hmpstat -- Check state of hardware memory protection
+npon -- Enable null protection
+npoff -- Disable null protection
+ttcop -- Dump thread table
+tt2cop -- Take snapshot of the thread table
+tcresetcop -- Reset thread counters
+txtcop -- Dump threadX table
+tmrtcop -- Dump timer table
+qtcop -- Dump queue table
+qicop -- Dump queue info
+etcop -- Dump events table
+smtcop -- Dump mutex and semaphore table
+isrtcop -- Dump ISRs tables on COP
+isrt2cop -- Take snapshot of isr table, print and reset stats
+top -- Display thread performace table
+tt -- Dump thread table
+tt2 -- Take snapshot of the thread table
+tcreset -- Reset thread counters
+txt -- Dump threadX table
+tmrt -- Dump timer table
+qt -- Dump queue table
+ipcqt -- Dump IPC queue table
+ipcqreset -- Reset IPC queue counters
+qi -- Dump queue info
+ipcqi -- Dump IPC queue info
+et -- Dump events table
+smt -- Dump mutex and semaphore table
+isrt -- Dump ISRs table
+isrt2 -- Take snapshot of isr table, print and reset stats
+csw -- Context switch logging
+configpack -- Save config pack data
+loadipu -- Load and run ipu path
+siit -- MonitorItSubimages
+ipucfg -- Set IPU CFG filter
+sleep -- Bring camera to sleep mode: 0-normal 1-deep.
+rtc --
+rtcset -- Set internal Real-Time-Clock and activate it
+rtcget -- Print internal Real-Time-Clock.
+default format: hhmmss
+if param 1 is given, format is: YYYYMMDDhhmmss
 
+rtcset_timeout -- Set RTC timeout.
+rtcget_timeout -- Get RTC timeout, in hex: 0xFFFFFFFF.
+rtcset_inforeg -- Set RTC inforeg.
+rtcget_inforeg -- Get RTC inforeg, in hex: 0xFFFFFFFF.
+```
+	
+Some of these are pretty interesting. Some I haven't yet come around to figure our (there seems to be a panorama mode!). Here's some of the highlights
+ - `rfitamron`
+	Gives full control over the lens. This one actually has a few "undocumented" subcommands that enable precise focus control, autofocus activation , zoom and everything that has anything to do with the lens (I guess the name reveals who was the manufacturer of the lens, Tamron is a well known brand). 
+    - `rfisettings`
+	All the camera settings can be read by issuing `rfisettings` command which will just dump them to stdout. Similarly `rfisetting` command can be used to change individual ones. Some don't seem to persist over reboots, though. 
+    - `rficapture` 
+	Simply commands the camera to take the photo. 
+	
+### Tools and utils
+	
+In [lytroctrl](https://github.com/ea/lytroctrl), I've implemented a number of commands and set a scafolding for all of them. I've made a couple of utilities that show how you can interact with the camera over WiFi. 
+	
+#### Shell
+	
+```
+	usage: shell.py [-h] [-v] [-a ADDRESS] [-p PORT] [-l] [-s]
+
+Lytro control shell
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -v, --verbose         output includes debug logs
+  -a ADDRESS, --address ADDRESS
+                        ip address
+  -p PORT, --port PORT  destination port
+  -l, --no-unlock       don't perform unlocking
+  -s, --no-keepalive    don't start keepalive connection (camera will sleep due to inactivity)
+```
+
+A simple shell will connect to the camera over WiFi, unlock it, present you with stdout and expect commands to be sent. Whenever a command is sent, output is synced back. Note that by default, error/logging is also emited which can be annoying so it's disabled by default, use `-v` to enable that. 
+	
+<img src="screenshots/08_uart_logs.png" width="800">
+	
+#### Demo
+
+There's a short script that demonstrates different functionalities by wiggling the lens, controling zoom and taking a photo:
+	
+```python
+	con = connections.TcpConnection(args.address,int(args.port))
+con.connect()
+if not args.no_unlock:
+	print("Unlocking...")
+	tr = transactions.GetCameraInfoTransact(con)
+	ci = tr.transact()
+	camera_serial = ci.serial_num
+	transactions.UnlockTransact(con,camera_serial).unlock()
+	print("Unlocked!")
+
+print("Do the lens dance")
+transactions.ExecTransact(con,"rfitamron wiggle").transact()
+time.sleep(3)
+print("Zooming to x3.14...")
+transactions.SetZoom(con).transact(payload=b"3.14")
+time.sleep(1)
+print("Taking photo")
+transactions.ExecTransact(con,"rficapture").transact()
+```
+	
+#### LiveView
+ 
+And finaly, an example that shows how to enable live view streaming. Streaming is performed over UDP multicast, and consists simply of transmited jpegs. You can either capture those directly, or instruct ffmpeg to save them. 
+	
+```python
+transactions.UDPLiveView(con).transact(enable=True,cratio=2,fps=1)
+utils.keep_alive(con)
+```
+	
+Keep alive function above will periodically issue a query command just to stave off the watchdog which turns of wifi to conserve battery. 
+	
+
+# Ideas?
+	
+And with that, we have all the components for what we set out to do. We can control zoom and focus, we can telecommand the camera to take a photo and we can stream live view which can be fed into computer vision algorithms. 
+There's plenty of squirells in my backyard, but I can take much better photos of them with my regular camera, and most of them are in focus!
+	
+That being said, I had fun doing thing and would love to hear if somebody has an interesting ideas that could benefit from this project. Lightfield cameras are definitely an interesting technology and this might be an affordable way to experiment with them. 
+	
+Cheers,
+
+-- ea
+	
+	
