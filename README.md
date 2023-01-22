@@ -74,7 +74,7 @@ Beneath the battery is the main SoC board which is based around a MIPS MCU calle
 
 Finally, the last board connects to the display as well as the capacitive touch sensor that controls zoom. It is on this board that we find a peculiar looking  unpopulated connector pad. Basic testing quickly reveals UART pins like shown, but all we get is a short boot message and no input or echo…
 
-<img src="screenshots/00_initial_output.jpg" width="800">
+<img src="screenshots/00_initial_output.png" width="800">
 
 
 Lets make a nice breakout of those pins for later use just in case. 
