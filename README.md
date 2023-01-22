@@ -166,11 +166,24 @@ With UART unresponsive, but encouraged by what we saw in the firmware, we turn t
 
 Again, thanks to <LyTRO Meltdown> docs, we have a pretty good start when it comes to wifi communication. Similarly, from Lyli project, we can see that WiFi communication is actually based on USB protocol and mostly follows the same protocol. Only that USB is actually based around SCSI commands, while WiFi is direct over TCP/IP. 
 Lytro meltdown doccuments the following set of commands:
-<TODO>
+  
+- load hardware info (`C2 00 00`)
+- load file (`C2 00 01`)
+- load picture list (`C2 00 02`)
+- load picture (`C2 00 05`)
+- load calibration data (`C2 00 06`)
+- load compressed raw picture (`C2 00 07`)
+- download command (`C4 00`)
+- query command (`C6 00`)
+- query camera time (`C6 00 03`)
+- query battery level (`C6 00 06`)
+- take a picture (`C0 00 00`)
+- set camera time (`C0 00 04`)
 
+  
 Some of these look incomplete and I am willing to bet there are more so our next step is to go back to the firmware to try to find where these are being processed. 
 
-## Command interpreter
+## Command interpreter - Finding our way around
 
 Now we are faced with a conundrum. We have this giant piece of code, all of these binaries from the firmware, and we want to find the small chunk of code that’s parsing incoming Wifi or USB data in order to locate the code that corresponds to commands observed from official software. 
 
@@ -178,24 +191,107 @@ This is a common problem in reverse engineering that I like to call localization
 
 Unusual or rare constants are a reverser’s friend. Those can be unique cryptographic IVs, but also something much less exotic. Consider that there are 3600 seconds in an hour. That seems like a round number in decimal, but is a somewhat unusual looking constant in hex. As such, there’s a chance it will be somewhat rare in the binary you are looking at. 
 
-On the other hand, GetTime command from above returns camera time in a very specific format. We can guess that at some point during its execution, it would need to convert seconds to hours or vice versa. Searching for seconds-in-hour constant in the binary reveals only a handful of locations which we can manually investigate. And sure enough, one of them definitely look like time/date formatting code. Backtracking through references quickly leads us to code that looks awfully like what we’d expect a command interpreter to look like. A series of switch statements with command handlers. 
+On the other hand, SetTime command from above expects camera time in a very specific format. We can guess that at some point during its execution, it would need to convert seconds to hours or vice versa. Searching for seconds-in-hour (3600 or 0xe10)constant in the binary reveals only a handful of locations which we can manually investigate. And sure enough, one of them definitely look like time/date formatting code. 
 
-Success, now we have our bearing in the firmware and can start exploring and make guesses about functionality with more confidence. 
+<img src="screenshots/04_timecode.png" width="800">
+ 
+Backtracking through references quickly leads us to code that looks awfully like what we’d expect a command interpreter to look like. A series of switch statements with command handlers. 
+
+<img src="screenshots/05_cmd_interreter.png" width="800">
+
+ 
+Success! Now we have our bearing in the firmware and can start exploring and make guesses about functionality with more confidence. 
 
 ## Command classes, commands and payloads
 
-All in all, by studying the command interpreter code we can deduce the following complete set of commands. All of them match with what was previously documented and observed, and there’s quite a few hidden an unknown ones.
-<INSERT table of all commands>
+All in all, by studying the command interpreter code we can deduce the following (mostly) complete set of commands. All of them match with what was previously documented and observed, and there’s quite a few hidden an unknown ones:
+  
+```python
+class CommandClass(Enum):
+	CMD_CTRL = 0xC0
+	CMD_FW = 0xC1
+	CMD_LOAD = 0xC2
+	CMD_CLR = 0xC3
+	CMD_READ = 0xC4
+	CMD_FW_UP = 0xC5
+	CMD_QUERY = 0xC6
 
+
+class CtrlCmd(Enum):
+	CMD_CLASS = CommandClass.CMD_CTRL
+	TAKE_PHOTO = 0x00
+	DELETE = 0x01
+	UPDATE_FW = 0x02
+	REBOOT = 0x03
+	SET_TIME = 0x04
+	UNK1 = 0x05 # something with files
+	UNK2 = 0x06 # delete all ? 
+	SET_SHARE_MODE_SSID = 0x07
+	SET_SYNC_MODE_SSID = 0x08
+	SET_SHARE_MODE_PASS = 0x09
+	SET_SYNC_MODE_PASS = 0x0A
+	SET_SHARE_MODE_AUTH = 0x0B
+	MANUAL_CTRL = 0x0C
+	WIFI_OFF = 0x0D
+	INJECT_UART = 0xFE
+	EXEC_CMD = 0xFF
+
+class FwCmd(Enum):
+	CMD_CLASS = CommandClass.CMD_FW
+	SET_FW_SIZE = 0x00
+
+class LoadCmd(Enum):
+	CMD_CLASS = CommandClass.CMD_LOAD
+	CAMERA_INFO = 0x00
+	FILE = 0x01
+	PHOTO_LIST = 0x02
+	UNK1 = 0x03
+	UNUSED = 0x04
+	PHOTO = 0x05
+	CALLIBRATION = 0x06
+	RAW  = 0x0a
+	CRASHES = 0x0b
+
+class ClearCmd(Enum):
+	CMD_CLASS = CommandClass.CMD_CLR
+	CLEAR_BUFFERS = 0x00
+
+class ReadCmd(Enum):
+	CMD_CLASS = CommandClass.CMD_READ
+	READ = 0x00
+
+class FirmwareUploadCmd(Enum):
+	CMD_CLASS = CommandClass.CMD_FW_UP
+	UPLOAD_CHUNK = 0x00
+
+class QueryCmd(Enum):
+	CMD_CLASS = CommandClass.CMD_QUERY
+	CONTENT_LENGTH = 0x00
+	UNK1 = 0x01
+	READ_UART = 0x02
+	CAMERA_TIME = 0x03
+	RECOVER_CALLIBRATION  = 0x04
+	READ_GLOB_80020a60 = 0x05
+	BATTERY = 0x06
+	SETTINGS = 0x0A
+```
+
+That's quite a lot of extra functionality reachable over USB or WIFI! Most are self explanatory, but some I am yet to explore. However, we aren't done yet. Remeber that UART is still locked.
 
 ## Secret Unlock command
 
-You’ll notice in the above that I’ve listed an UNLOCK command. It first caught my attention because it’s clearly doing something with SHA1. That has to be something interesting. 
-After cleaning up the decompiled code, the functionality becomes obvious.
+You’ll notice in the above that I’ve listed an EXEC command. It was an obvious choice to focus on and try to figure out. At first, it looked like it just expects a string to run as command, but it simply wouldn't work. Digging deeper into it revealed something interesting. It first caught my attention because it’s clearly doing something with SHA1. That has to be something interesting!After cleaning up the decompiled code, the functionality becomes obvious.
+  
+<img src="screenshots/06_secret_hash.png" width="800">
+
+  
 The function takes some string from the memory, concatenates “ please” to it and calculates a SHA1 hash of it. Then it compares that hash to whatever was received as payload. 
+  
 After a bit more  digging, it becomes obvious that the string in memory is actually the serial number of the camera. We can easily get the serial number, so let’s calculate the expected hash, send it and see what happens:
 
-Well, looks like that takes care of the locked serial console. In addition to unlocking the serial output, this enables command execution a lot of other functionality.
+<img src="screenshots/07_uart_enabled.png" width="800">
+
+Well, looks like that takes care of the locked serial console. In addition to unlocking the serial output, this enables command execution and a lot of other functionality. It turns out that a good number of above commands were checking this global variable before being run. Sending the correct hash sets the variable and enables the locked commands. Thanks Lytro for not making it too complex!
 
 
 ## Commands over Wifi
