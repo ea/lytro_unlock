@@ -148,11 +148,17 @@ Even though we don’t know the exact size of the binaries, we can assume they a
 940.so:    ELF 32-bit LSB executable, MIPS, MIPS-II version 1 (SYSV), statically linked, stripped
 ```
 
-Examining the first one reveals what appears to be a bootloader, or at least a stage of it. We can see the same strings we observed in UART output. Binaries that follow are bigger and appear to contain a lot more functionality.
+Examining the first one reveals what appears to be a bootloader, or at least a stage of it. We can see the same strings we observed in UART output. 
 
-Randomly stumbling through the strings reveal the following:
+<img src="screenshots/02_bootloop.jpg" width="800">
 
-This definitely appears to be some sort of command palette with command names, descriptions and associated target functions. This is great news! Already I can see some that look very interesting. The question is, how do we get to them… No response over UART. 
+Binaries that follow are bigger and appear to contain a lot more functionality.
+
+Randomly stumbling through the strings in `2A0540` reveals the following:
+
+<img src="screenshots/03_commands.jpg" width="800">
+
+This definitely appears to be some sort of command palette with command names, descriptions and associated target functions. This is great news! Already I can see some that look very interesting. The question is, how do we get to them? Remeber, no response over UART.
 
 ## Interfaces
 
