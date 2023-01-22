@@ -74,6 +74,7 @@ Beneath the battery is the main SoC board which is based around a MIPS MCU calle
 
 Finally, the last board connects to the display as well as the capacitive touch sensor that controls zoom. It is on this board that we find a peculiar looking  unpopulated connector pad. Basic testing quickly reveals UART pins like shown, but all we get is a short boot message and no input or echo…
 
+<img src="screenshots/00_initial_output.jpg" width="800">
 
 
 Lets make a nice breakout of those pins for later use just in case. 
@@ -83,13 +84,71 @@ Lets make a nice breakout of those pins for later use just in case.
 ## The firmware
 
 So we have a serial port, but it doesn’t give us anything useful (yet!).  Let’s check out the firmware to see if we should even expect anything on the serial output. 
-Luckily for us, <INSERT NAME> has archived all the public firmware versions at : <insert website>
+Luckily for us, "Lytro Meltdown" has archived all the public firmware versions at : http://optics.miloush.net/lytro/TheResources.aspx
 
 Firmware update seems to be complete and not incremental, which is a good thing. It starts with a simple JSON text that describes the actual data that follows. It appears that the firmware is just flat memory contents whithout any disernable file system. Binwalk reveals the following:
 
-Remember, ELF files don’t imply that we are dealing with Linux. And indeed, in this case, ELF format is used for memory mapping and binary loading purposes. All the binaries seem to be mapped to their respective addresses and cross-reference each other. The whole firmware seems to be based around an unknown real-time operating system. 
+<img src="screenshots/01_binwalk.jpg" width="800">
 
-Even though we don’t know the exact size of the binaries, we can assume they are contiguous in memory and just extract the maximum possible size. That gives us the following ELF files. Examining the first one reveals what appears to be a bootloader, or at least a stage of it. We can see the same strings we observed in UART output. Binaries that follow are bigger and appear to contain a lot more functionality.
+Remember, ELF files don’t imply that we are dealing with Linux. And indeed, in this case, ELF format is used for memory mapping and binary loading purposes. All the binaries seem to be mapped to their respective addresses and cross-reference each other. 
+```
+$ readelf -a 2A0540.so
+ELF Header:
+  Magic:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00
+  Class:                             ELF32
+  Data:                              2's complement, little endian
+  Version:                           1 (current)
+  OS/ABI:                            UNIX - System V
+  ABI Version:                       0
+  Type:                              EXEC (Executable file)
+  Machine:                           MIPS R3000
+  Version:                           0x1
+  Entry point address:               0x80000608
+  Start of program headers:          52 (bytes into file)
+  Start of section headers:          0 (bytes into file)
+  Flags:                             0x70001001, noreorder, o32, mips32r2
+  Size of this header:               52 (bytes)
+  Size of program headers:           32 (bytes)
+  Number of program headers:         1
+  Size of section headers:           40 (bytes)
+  Number of section headers:         0
+  Section header string table index: 12 <corrupt: out of range>
+
+There are no sections in this file.
+
+There are no sections to group in this file.
+
+Program Headers:
+  Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
+  LOAD           0x000054 0x8028e280 0x8028e280 0x134000 0x134000 RWE 0x8
+
+There is no dynamic section in this file.
+
+There are no relocations in this file.
+
+The decoding of unwind sections for machine type MIPS R3000 is not currently supported.
+
+Dynamic symbol information is not available for displaying symbols.
+
+No version information found in this file.
+```
+The whole firmware seems to be based around an unknown real-time operating system. 
+
+Even though we don’t know the exact size of the binaries, we can assume they are contiguous in memory and just extract the maximum possible size. That gives us the following ELF files: 
+
+```
+2940.so:   ELF 32-bit LSB executable, MIPS, MIPS32 rel2 version 1 (SYSV), statically linked, no section header
+2A0540.so: ELF 32-bit LSB executable, MIPS, MIPS32 rel2 version 1 (SYSV), statically linked, no section header
+3D4594.so: ELF 32-bit LSB executable, MIPS, MIPS32 rel2 version 1 (SYSV), statically linked, no section header
+5F6C68.so: ELF 32-bit LSB executable, MIPS, MIPS32 rel2 version 1 (SYSV), statically linked, no section header
+63DB40.so: ELF 32-bit LSB executable, MIPS, MIPS32 version 1 (SYSV), statically linked, not stripped
+641B40.so: ELF 32-bit LSB executable, MIPS, MIPS32 version 1 (SYSV), statically linked, not stripped
+645B40.so: ELF 32-bit LSB executable, MIPS, MIPS32 version 1 (SYSV), statically linked, not stripped
+649B40.so: ELF 32-bit LSB executable, MIPS, MIPS32 version 1 (SYSV), statically linked, not stripped
+940.so:    ELF 32-bit LSB executable, MIPS, MIPS-II version 1 (SYSV), statically linked, stripped
+```
+
+Examining the first one reveals what appears to be a bootloader, or at least a stage of it. We can see the same strings we observed in UART output. Binaries that follow are bigger and appear to contain a lot more functionality.
 
 Randomly stumbling through the strings reveal the following:
 
