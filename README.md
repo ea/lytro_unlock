@@ -88,7 +88,7 @@ Luckily for us, "Lytro Meltdown" has archived all the public firmware versions a
 
 Firmware update seems to be complete and not incremental, which is a good thing. It starts with a simple JSON text that describes the actual data that follows. It appears that the firmware is just flat memory contents whithout any disernable file system. Binwalk reveals the following:
 
-<img src="screenshots/01_binwalk.jpg" width="800">
+<img src="screenshots/01_binwalk.png" width="800">
 
 Remember, ELF files don’t imply that we are dealing with Linux. And indeed, in this case, ELF format is used for memory mapping and binary loading purposes. All the binaries seem to be mapped to their respective addresses and cross-reference each other. 
 ```
@@ -150,13 +150,13 @@ Even though we don’t know the exact size of the binaries, we can assume they a
 
 Examining the first one reveals what appears to be a bootloader, or at least a stage of it. We can see the same strings we observed in UART output. 
 
-<img src="screenshots/02_bootloop.jpg" width="800">
+<img src="screenshots/02_bootloop.png" width="800">
 
 Binaries that follow are bigger and appear to contain a lot more functionality.
 
 Randomly stumbling through the strings in `2A0540` reveals the following:
 
-<img src="screenshots/03_commands.jpg" width="800">
+<img src="screenshots/03_commands.png" width="800">
 
 This definitely appears to be some sort of command palette with command names, descriptions and associated target functions. This is great news! Already I can see some that look very interesting. The question is, how do we get to them? Remeber, no response over UART.
 
