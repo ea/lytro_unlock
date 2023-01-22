@@ -13,10 +13,10 @@ This project documents and implements a python library that unlocks and makes av
 - Custom code execution
 
 Although it failed as a commercial product, lytro camera has some pretty nifty tech (only one of which is very high optical zoom). It is my hope that somebody out there has a cool idea that would benefit from having full software control over the camera. 
-__If you are interested in the details, read on. Otherwise, feel free to play with supporting software under [lytroctrl](https://github.com/ea/lytroctrl).
+__If you are interested in the details, read on. Otherwise, feel free to play with supporting software under [lytroctrl](https://github.com/ea/lytroctrl).__
 
 __No physical modifications to the cameras are neccessary to play with this. The unlocking and subsequent commands work over WiFi. 
-However, there's a chance it can brick your camera (it's kind of a brick already) and it will most definitely void your waranty! Be warned!
+However, there's a chance it can brick your camera (it's kind of a brick already) and it will most definitely void your waranty! Be warned!__
 
 ## The Why - Start
 
