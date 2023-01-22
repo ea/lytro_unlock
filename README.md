@@ -894,6 +894,10 @@ utils.keep_alive(con)
 ```
 	
 Keep alive function above will periodically issue a query command just to stave off the watchdog which turns of wifi to conserve battery. 
+
+#### Lua code execution
+
+Firmware appears to have support for Lua scripts. This is still a TODO. It would be nice to have a documented way of executing Lua code. 
 	
 
 # Ideas?
