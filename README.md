@@ -912,5 +912,7 @@ Feel free to open issues to ask questions and make pull requests!
 Cheers,
 
 -- ea
+
+( https://twitter.com/FuzzyAleks / https://infosec.exchange/@FuzzyAleks  )
 	
 	
