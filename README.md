@@ -826,7 +826,7 @@ rtcset_inforeg -- Set RTC inforeg.
 rtcget_inforeg -- Get RTC inforeg, in hex: 0xFFFFFFFF.
 ```
 	
-Some of these are pretty interesting. Some I haven't yet come around to figure our (there seems to be a panorama mode!). Here's some of the highlights
+Some of these are pretty interesting. Some I haven't yet come around to figure out (there seems to be a panorama mode!). Here's some of the highlights
  - `rfitamron`
 	Gives full control over the lens. This one actually has a few "undocumented" subcommands that enable precise focus control, autofocus activation , zoom and everything that has anything to do with the lens (I guess the name reveals who was the manufacturer of the lens, Tamron is a well known brand). 
     - `rfisettings`
