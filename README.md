@@ -44,7 +44,8 @@ While both of these provide good starting points, they don’t offer much benefi
 Just looking at a product, without considering existing software, I thought it would be a lot more useful if it had features that a normal webcam would have. With that in mind, I set out to see if implementing the following was possible:
 - control zoom level through software 
 - Control focus point through software
-- Take a picture on demand 
+- Take a picture on demand
+
 Initially, as stretch goals I was considering:
 - firmware modification
 - Arbitrary code execution
