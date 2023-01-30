@@ -165,7 +165,7 @@ This definitely appears to be some sort of command palette with command names, d
 
 ## Interfaces
 
-With UART unresponsive, but encouraged by what we saw in the firmware, we turn to other way of interacting with the camera. That is, USB and WiFi. 
+With UART unresponsive, but encouraged by what we saw in the firmware, we turn to other ways of interacting with the camera. That is, USB and WiFi. 
 
 Again, thanks to <LyTRO Meltdown> docs, we have a pretty good start when it comes to wifi communication. Similarly, from Lyli project, we can see that WiFi communication is actually based on USB protocol and mostly follows the same protocol. Only that USB is actually based around SCSI commands, while WiFi is direct over TCP/IP. 
 Lytro meltdown doccuments the following set of commands:
